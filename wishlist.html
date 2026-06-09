@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foamix Mattress - Wishlist</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Wishlist Page Styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .wishlist-container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        .wishlist-header {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .wishlist-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .wishlist-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .wishlist-card:hover {
+            transform: scale(1.05);
+        }
+
+        .wishlist-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .wishlist-card h3 {
+            font-size: 18px;
+            margin: 10px 0;
+            color: #222;
+        }
+
+        .wishlist-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .remove-btn,
+        .whatsapp-btn {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .remove-btn {
+            background-color: #ff4d4d;
+            color: #fff;
+        }
+
+        .remove-btn:hover {
+            background-color: #e60000;
+        }
+
+        .whatsapp-btn {
+            background-color: #25d366;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+
+        .whatsapp-btn:hover {
+            background-color: #1ebe5d;
+        }
+
+        /* Empty Wishlist Message */
+        .empty-wishlist {
+            text-align: center;
+            font-size: 18px;
+            color: #777;
+            margin-top: 30px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .wishlist-container {
+                padding: 15px;
+            }
+
+            .wishlist-header {
+                font-size: 24px;
+            }
+
+            .wishlist-card img {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wishlist-container">
+        <h1 class="wishlist-header">My Wishlist ❤️</h1>
+        <div id="wishlistItems" class="wishlist-items"></div>
+        <p id="emptyMessage" class="empty-wishlist" style="display: none;">
+            Your wishlist is empty. Add some products!
+        </p>
+    </div>
+
+    <script>
+        // Sample Products Data (Can be fetched from main product list)
+        const products = [
+            { id: 1, name: "Foamix Comfort Mattress", image: "images/mattress1.jpg", link: "product1.html" },
+            { id: 2, name: "Foamix Orthopedic Mattress", image: "images/mattress2.jpg", link: "product2.html" },
+            { id: 3, name: "Foamix Memory Foam Mattress", image: "images/mattress3.jpg", link: "product3.html" },
+            { id: 4, name: "Foamix Gel Mattress", image: "images/mattress4.jpg", link: "product4.html" }
+        ];
+
+        // Load Wishlist from localStorage
+        let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+        const wishlistContainer = document.getElementById("wishlistItems");
+        const emptyMessage = document.getElementById("emptyMessage");
+
+        function renderWishlist() {
+            wishlistContainer.innerHTML = "";
+            if (wishlist.length === 0) {
+                emptyMessage.style.display = "block";
+                return;
+            } else {
+                emptyMessage.style.display = "none";
+            }
+
+            wishlist.forEach((itemId) => {
+                const product = products.find((p) => p.id === itemId);
+                if (product) {
+                    const card = document.createElement("div");
+                    card.classList.add("wishlist-card");
+
+                    card.innerHTML = `
+            <img src="${product.image}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <div class="wishlist-actions">
+              <button class="remove-btn" onclick="removeFromWishlist(${product.id})">Remove</button>
+              <a class="whatsapp-btn" href="https://wa.me/?text=${encodeURIComponent(`Check out this product: ${product.name} - ${window.location.origin}/${product.link}`)}" target="_blank">
+                📩 WhatsApp
+              </a>
+            </div>
+          `;
+                    wishlistContainer.appendChild(card);
+                }
+            });
+        }
+
+        // Remove Product from Wishlist
+        function removeFromWishlist(productId) {
+            wishlist = wishlist.filter((id) => id !== productId);
+            localStorage.setItem("wishlist", JSON.stringify(wishlist));
+            renderWishlist();
+        }
+
+        // Initial Rendering
+        renderWishlist();
+    </script>
+</body>
+
+</html>

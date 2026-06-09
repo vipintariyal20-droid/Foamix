@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile | Foamix</title>
+
+    <!-- Google Sign-In API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0078ff, #00c6ff);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background: #fff;
+            width: 400px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-container h2 {
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .login-container p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .login-btn {
+            background-color: #0078ff;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .login-btn:hover {
+            background-color: #005fcc;
+        }
+
+        .divider {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #888;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #ccc;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .social-login {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        .social-login button {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #fff;
+            transition: transform 0.2s;
+        }
+
+        .social-login button:hover {
+            transform: scale(1.05);
+        }
+
+        .google-btn {
+            background-color: #db4437;
+        }
+
+       
+
+        .user-info {
+            margin-top: 20px;
+            display: none;
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        .user-info img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .logout-btn {
+            margin-top: 15px;
+            background-color: #ff3b3b;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h2>Welcome Back!</h2>
+        <p>Sign in to manage your Foamix profile</p>
+
+        <!-- Normal Login Form -->
+        <form id="login-form">
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" placeholder="Enter your email" required />
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" placeholder="Enter your password" required />
+            </div>
+            <button type="submit" class="login-btn">Sign In</button>
+        </form>
+
+        <div class="divider">OR</div>
+
+        <!-- Social Login Buttons -->
+        <div class="social-login">
+            <button class="google-btn" id="google-login">
+                <i class="fab fa-google"></i> Sign in with Google
+            </button>
+           
+        </div>
+
+        <!-- User Info Box -->
+        <div class="user-info" id="user-info">
+            <img id="user-pic" src="" alt="Profile Picture" />
+            <p id="user-name"></p>
+            <p id="user-email"></p>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // Google Login Implementation
+        const googleBtn = document.getElementById("google-login");
+
+        googleBtn.addEventListener("click", () => {
+            google.accounts.id.initialize({
+                client_id: "148064078561-k99tteulb5c1a4je9tbgaf0c3r3h9ceq.apps.googleusercontent.com",
+                callback: handleGoogleLogin
+            });
+
+            google.accounts.id.prompt();
+        });
+
+        function handleGoogleLogin(response) {
+            const data = JSON.parse(atob(response.credential.split(".")[1]));
+
+            document.getElementById("login-form").style.display = "none";
+            document.querySelector(".social-login").style.display = "none";
+
+            const userBox = document.getElementById("user-info");
+            document.getElementById("user-pic").src = data.picture;
+            document.getElementById("user-name").innerText = `Hello, ${data.name}`;
+            document.getElementById("user-email").innerText = data.email;
+            userBox.style.display = "block";
+        }
+
+        function logout() {
+            location.reload();
+        }
+    </script>
+</body>
+
+</html>
